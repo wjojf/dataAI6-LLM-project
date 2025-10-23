@@ -11,10 +11,10 @@ from pathlib import Path
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
-from lexicon_absa import LexiconABSA
-from transformer_absa import TransformerABSA
-from llm_absa import LLMABSA
-from utils import create_sample_data, print_analysis_results
+from src.lexicon_absa import LexiconABSA
+from src.transformer_absa import TransformerABSA
+from src.llm_absa import LLMABSA
+from src.utils import create_sample_data, print_analysis_results
 
 
 def main():

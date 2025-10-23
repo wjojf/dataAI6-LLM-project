@@ -15,7 +15,13 @@ class TransformerABSA(ABSAAnalyzer):
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         
         try:
-            self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+            # Try loading with fast tokenizer first
+            try:
+                self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+            except Exception:
+                # Fall back to slow tokenizer if fast tokenizer fails
+                self.tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=False)
+            
             self.model = AutoModelForSequenceClassification.from_pretrained(model_name)
             self.model.to(self.device)
             self.nlp = spacy.load("en_core_web_sm")
@@ -98,17 +104,16 @@ class TransformerABSA(ABSAAnalyzer):
                 aspect_context = self._get_aspect_context(text, aspect)
                 result = classifier(aspect_context)
                 
-                sentiment_label = result[0]['label'].lower()
+                sentiment_label = self._normalize_sentiment_label(result[0]['label'])
                 confidence = result[0]['score']
                 
-                if sentiment_label in ['positive', 'negative', 'neutral']:
-                    aspect_sentiment = AspectSentiment(
-                        aspect=aspect,
-                        sentiment=sentiment_label,
-                        confidence=confidence,
-                        text_span=self._find_aspect_span(text, aspect)
-                    )
-                    aspect_sentiments.append(aspect_sentiment)
+                aspect_sentiment = AspectSentiment(
+                    aspect=aspect,
+                    sentiment=sentiment_label,
+                    confidence=confidence,
+                    text_span=self._find_aspect_span(text, aspect)
+                )
+                aspect_sentiments.append(aspect_sentiment)
                     
             except Exception as e:
                 print(f"Error processing aspect '{aspect}': {e}")
@@ -165,3 +170,30 @@ class TransformerABSA(ABSAAnalyzer):
             2: 'positive'
         }
         return label_mapping.get(predicted_class, 'neutral')
+    
+    def _normalize_sentiment_label(self, label: str) -> str:
+        """Normalize sentiment labels from different models to standard format"""
+        label_lower = label.lower()
+        
+        # Handle standard labels
+        if label_lower in ['positive', 'negative', 'neutral']:
+            return label_lower
+        
+        # Handle LABEL_X format (common in Hugging Face models)
+        if 'label_0' in label_lower or label_lower == '0':
+            return 'negative'
+        elif 'label_1' in label_lower or label_lower == '1':
+            return 'neutral'
+        elif 'label_2' in label_lower or label_lower == '2':
+            return 'positive'
+        
+        # Handle other common variations
+        if 'pos' in label_lower:
+            return 'positive'
+        elif 'neg' in label_lower:
+            return 'negative'
+        elif 'neu' in label_lower:
+            return 'neutral'
+        
+        # Default to neutral if unknown
+        return 'neutral'

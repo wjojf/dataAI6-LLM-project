@@ -59,11 +59,12 @@ class LexiconABSA(ABSAAnalyzer):
         
         for chunk in doc.noun_chunks:
             if len(chunk) > 1:
+                # Use the root/head token of the noun chunk for dependency parsing
                 aspect_info = {
                     'text': chunk.text.lower(),
                     'start': chunk.start_char,
                     'end': chunk.end_char,
-                    'token': chunk,
+                    'token': chunk.root,
                     'confidence': 0.9
                 }
                 aspects.append(aspect_info)
@@ -153,22 +154,27 @@ class LexiconABSA(ABSAAnalyzer):
         if aspect_token == sentiment_token:
             return False
         
-        for token in doc:
-            if token == aspect_token:
-                for child in token.children:
-                    if child == sentiment_token:
-                        return True
-                for ancestor in token.ancestors:
-                    if ancestor == sentiment_token:
-                        return True
-            
-            if token == sentiment_token:
-                for child in token.children:
-                    if child == aspect_token:
-                        return True
-                for ancestor in token.ancestors:
-                    if ancestor == aspect_token:
-                        return True
+        # Check if sentiment is a direct modifier of the aspect
+        if sentiment_token in aspect_token.children:
+            return True
+        
+        # Check if aspect is a child of the sentiment
+        if aspect_token in sentiment_token.children:
+            return True
+        
+        # Check if they share a common head (e.g., both modify the same verb)
+        if aspect_token.head == sentiment_token.head and aspect_token.head != aspect_token:
+            return True
+        
+        # Check if they're connected through a copula (e.g., "food is good")
+        if aspect_token.head == sentiment_token or sentiment_token.head == aspect_token:
+            return True
+        
+        # Check if they're in the same sentence and within proximity (window of 5 tokens)
+        aspect_idx = aspect_token.i
+        sentiment_idx = sentiment_token.i
+        if abs(aspect_idx - sentiment_idx) <= 5:
+            return True
         
         return False
     
