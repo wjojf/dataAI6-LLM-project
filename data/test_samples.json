@@ -1,0 +1,71 @@
+[
+  {
+    "text": "The pizza was delicious but the service was terrible.",
+    "ground_truth": [
+      {"aspect": "pizza", "sentiment": "positive", "confidence": 0.9},
+      {"aspect": "service", "sentiment": "negative", "confidence": 0.9}
+    ]
+  },
+  {
+    "text": "The laptop has great performance and excellent battery life.",
+    "ground_truth": [
+      {"aspect": "performance", "sentiment": "positive", "confidence": 0.8},
+      {"aspect": "battery life", "sentiment": "positive", "confidence": 0.8}
+    ]
+  },
+  {
+    "text": "The hotel room was clean and comfortable, but the WiFi was slow.",
+    "ground_truth": [
+      {"aspect": "hotel room", "sentiment": "positive", "confidence": 0.8},
+      {"aspect": "WiFi", "sentiment": "negative", "confidence": 0.7}
+    ]
+  },
+  {
+    "text": "The food quality is average, nothing special.",
+    "ground_truth": [
+      {"aspect": "food quality", "sentiment": "neutral", "confidence": 0.6}
+    ]
+  },
+  {
+    "text": "Amazing customer support and fast delivery!",
+    "ground_truth": [
+      {"aspect": "customer support", "sentiment": "positive", "confidence": 0.9},
+      {"aspect": "delivery", "sentiment": "positive", "confidence": 0.8}
+    ]
+  },
+  {
+    "text": "The camera quality is outstanding but the battery drains quickly.",
+    "ground_truth": [
+      {"aspect": "camera quality", "sentiment": "positive", "confidence": 0.9},
+      {"aspect": "battery", "sentiment": "negative", "confidence": 0.8}
+    ]
+  },
+  {
+    "text": "The restaurant ambiance was perfect, though the prices were high.",
+    "ground_truth": [
+      {"aspect": "ambiance", "sentiment": "positive", "confidence": 0.8},
+      {"aspect": "prices", "sentiment": "negative", "confidence": 0.7}
+    ]
+  },
+  {
+    "text": "The software interface is user-friendly and the features are comprehensive.",
+    "ground_truth": [
+      {"aspect": "interface", "sentiment": "positive", "confidence": 0.8},
+      {"aspect": "features", "sentiment": "positive", "confidence": 0.8}
+    ]
+  },
+  {
+    "text": "The product arrived damaged and the packaging was poor.",
+    "ground_truth": [
+      {"aspect": "product", "sentiment": "negative", "confidence": 0.9},
+      {"aspect": "packaging", "sentiment": "negative", "confidence": 0.8}
+    ]
+  },
+  {
+    "text": "The staff was friendly and helpful, making the experience enjoyable.",
+    "ground_truth": [
+      {"aspect": "staff", "sentiment": "positive", "confidence": 0.9},
+      {"aspect": "experience", "sentiment": "positive", "confidence": 0.8}
+    ]
+  }
+]
