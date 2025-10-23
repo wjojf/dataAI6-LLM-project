@@ -374,3 +374,12 @@ The unified API design enables organizations to choose the most appropriate appr
 3. Hutto, C. J., & Gilbert, E. (2014). VADER: A Parsimonious Rule-based Model for Sentiment Analysis of Social Media Text.
 4. Esuli, A., & Sebastiani, F. (2006). SentiWordNet: A Publicly Available Lexical Resource for Opinion Mining.
 5. Honnibal, M., & Montani, I. (2017). spaCy 2: Natural language understanding with Bloom embeddings, convolutional neural networks and incremental parsing.
+6. Meta AI (2024). Llama 3.1: A collection of pretrained and fine-tuned generative text models.
+7. Yang, H., et al. (2021). DeBERTa: Decoding-enhanced BERT with Disentangled Attention.
+8. Liu, Y., et al. (2019). RoBERTa: A Robustly Optimized BERT Pretraining Approach.
+9. OpenAI (2023). GPT-4 Technical Report. OpenAI.
+10. Anthropic (2023). Claude: A Constitutional AI Assistant. Anthropic.
+11. Ollama (2024). Ollama: Run large language models locally. https://ollama.ai
+12. Hugging Face (2024). Transformers: State-of-the-art Machine Learning for PyTorch, TensorFlow, and JAX.
+
+**Acknowledgments:** This project utilized Large Language Models from OpenAI and Anthropic for code generation, data sample creation, and technical documentation assistance. The implementation leverages Meta's Llama 3.1 model through Ollama for local LLM-based sentiment analysis.
