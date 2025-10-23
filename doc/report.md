@@ -2,11 +2,12 @@
 
 **Course:** Applied Computer Science – Data & AI 6  
 **Project:** Aspect-Based Sentiment Analysis  
+**Team:** Team 14 - Eren Korkmaz & Tikhon Kozlov  
 **Date:** 2025  
 
 ## Abstract
 
-This project presents a comprehensive implementation and comparison of three different approaches to Aspect-Based Sentiment Analysis (ABSA): lexicon-based, transformer-based, and LLM-based methods. We develop a unified API interface and evaluate each approach on a curated dataset of customer reviews. Our results show that while each method has distinct advantages, the LLM-based approach achieves the highest accuracy (82%) at the cost of processing speed, while the lexicon-based approach offers the best speed-accuracy trade-off for real-time applications.
+This project presents a comprehensive implementation and comparison of three different approaches to Aspect-Based Sentiment Analysis (ABSA): lexicon-based, transformer-based, and LLM-based methods. We develop a unified API interface and evaluate each approach on a curated dataset of customer reviews. Our results show that while each method has distinct advantages, the LLM-based approach achieves the highest precision at the cost of processing speed, while the lexicon-based approach offers the best speed-performance trade-off for real-time applications.
 
 ## 1. Introduction
 
@@ -231,9 +232,9 @@ Each sample includes:
 
 ### 4.3 Test Environment
 
-- **Hardware:** CPU: Intel i7, GPU: NVIDIA RTX 3080
-- **Software:** Python 3.9, PyTorch 1.12, CUDA 11.6
-- **Models:** spaCy en_core_web_sm, DeBERTa ABSA, Llama 3.1 8B
+- **Hardware:** MacBook M1 Chip, 16GB RAM
+- **Software:** Python 3.9, PyTorch 1.12, CPU processing
+- **Models:** spaCy en_core_web_sm, RoBERTa sentiment model (fallback), Llama 3.1 8B
 
 ## 5. Results and Analysis
 
@@ -250,22 +251,22 @@ Each sample includes:
 ### 5.2 Qualitative Analysis
 
 **Lexicon-Based Approach:**
-- ✅ Strengths: Fastest processing (0.009s avg), finds most aspects (5.3 avg), interpretable
-- ❌ Weaknesses: Lower precision (finds many aspects but some may be irrelevant), struggles with context
-- 📊 Best for: Real-time applications, resource-constrained environments
-- 🔍 Example: "The pizza was delicious but the service was terrible" → Found 4 aspects (pizza, service, the pizza, the service)
+- Strengths: Fastest processing (0.009s avg), finds most aspects (5.3 avg), interpretable
+- Weaknesses: Lower precision (finds many aspects but some may be irrelevant), struggles with context
+- Best for: Real-time applications, resource-constrained environments
+- Example: "The pizza was delicious but the service was terrible" → Found 4 aspects (pizza, service, the pizza, the service)
 
 **Transformer-Based Approach:**
-- ✅ Strengths: Good balance of speed (0.171s avg) and precision, high confidence scores
-- ❌ Weaknesses: Moderate aspect detection (3.7 avg), requires model dependencies
-- 📊 Best for: Production systems with balanced accuracy and speed requirements
-- 🔍 Example: Same text → Found 2 precise aspects (pizza: positive 0.953, service: negative 0.901)
+- Strengths: Good balance of speed (0.171s avg) and precision, high confidence scores
+- Weaknesses: Moderate aspect detection (3.7 avg), requires model dependencies
+- Best for: Production systems with balanced accuracy and speed requirements
+- Example: Same text → Found 2 precise aspects (pizza: positive 0.953, service: negative 0.901)
 
 **LLM-Based Approach:**
-- ✅ Strengths: Highest precision (2.3 avg aspects, most relevant), excellent context understanding
-- ❌ Weaknesses: Slowest processing (10.732s avg), requires local LLM setup
-- 📊 Best for: Research, complex analysis tasks, high-accuracy requirements
-- 🔍 Example: Same text → Found 2 most relevant aspects (pizza: positive 0.900, service: negative 0.800)
+- Strengths: Highest precision (2.3 avg aspects, most relevant), excellent context understanding
+- Weaknesses: Slowest processing (10.732s avg), requires local LLM setup
+- Best for: Research, complex analysis tasks, high-accuracy requirements
+- Example: Same text → Found 2 most relevant aspects (pizza: positive 0.900, service: negative 0.800)
 
 ### 5.3 Performance Analysis
 
