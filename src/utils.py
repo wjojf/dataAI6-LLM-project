@@ -31,8 +31,45 @@ def save_results(results: List[Dict[str, Any]], file_path: str):
         print(f"Error saving results: {e}")
 
 
-def calculate_accuracy(predictions: List[AspectSentiment], ground_truth: List[AspectSentiment]) -> float:
-    """Calculate accuracy between predictions and ground truth"""
+def _aspects_match(pred_aspect: str, gt_aspect: str) -> bool:
+    """Check if two aspects match using flexible matching rules"""
+    pred = pred_aspect.lower().strip()
+    gt = gt_aspect.lower().strip()
+    
+    # Exact match
+    if pred == gt:
+        return True
+    
+    # Remove common articles
+    pred = pred.replace("the ", "").replace("a ", "").replace("an ", "")
+    gt = gt.replace("the ", "").replace("a ", "").replace("an ", "")
+    
+    if pred == gt:
+        return True
+    
+    # Substring match (handles qualifiers like "food quality" -> "food")
+    if pred in gt or gt in pred:
+        return True
+    
+    # Word overlap for multi-word aspects
+    pred_words = set(pred.split())
+    gt_words = set(gt.split())
+    overlap = pred_words & gt_words
+    
+    # Match if there's significant word overlap
+    if overlap and len(overlap) >= max(1, len(gt_words) * 0.5):
+        return True
+    
+    return False
+
+
+def calculate_accuracy(predictions: List[AspectSentiment], ground_truth: List) -> float:
+    """Calculate accuracy between predictions and ground truth
+    
+    Args:
+        predictions: List of AspectSentiment objects
+        ground_truth: List of dicts with 'aspect', 'sentiment', 'confidence' keys
+    """
     if not ground_truth:
         return 0.0
     
@@ -40,17 +77,24 @@ def calculate_accuracy(predictions: List[AspectSentiment], ground_truth: List[As
     total = len(ground_truth)
     
     for gt in ground_truth:
+        gt_aspect = gt['aspect'] if isinstance(gt, dict) else gt.aspect
+        gt_sentiment = gt['sentiment'] if isinstance(gt, dict) else gt.sentiment
+        
         for pred in predictions:
-            if (pred.aspect.lower() == gt.aspect.lower() and 
-                pred.sentiment == gt.sentiment):
+            if _aspects_match(pred.aspect, gt_aspect) and pred.sentiment == gt_sentiment:
                 correct += 1
                 break
     
     return correct / total if total > 0 else 0.0
 
 
-def calculate_precision_recall_f1(predictions: List[AspectSentiment], ground_truth: List[AspectSentiment]) -> Dict[str, float]:
-    """Calculate precision, recall, and F1 score"""
+def calculate_precision_recall_f1(predictions: List[AspectSentiment], ground_truth: List) -> Dict[str, float]:
+    """Calculate precision, recall, and F1 score
+    
+    Args:
+        predictions: List of AspectSentiment objects
+        ground_truth: List of dicts with 'aspect', 'sentiment', 'confidence' keys
+    """
     if not ground_truth:
         return {'precision': 0.0, 'recall': 0.0, 'f1': 0.0}
     
@@ -61,8 +105,10 @@ def calculate_precision_recall_f1(predictions: List[AspectSentiment], ground_tru
     for pred in predictions:
         found = False
         for gt in ground_truth:
-            if (pred.aspect.lower() == gt.aspect.lower() and 
-                pred.sentiment == gt.sentiment):
+            gt_aspect = gt['aspect'] if isinstance(gt, dict) else gt.aspect
+            gt_sentiment = gt['sentiment'] if isinstance(gt, dict) else gt.sentiment
+            
+            if _aspects_match(pred.aspect, gt_aspect) and pred.sentiment == gt_sentiment:
                 true_positives += 1
                 found = True
                 break

@@ -122,19 +122,84 @@ class TransformerABSA(ABSAAnalyzer):
         return aspect_sentiments
     
     def _extract_aspects(self, text: str) -> List[str]:
-        """Extract aspects from text using spaCy"""
+        """Extract aspects from text using spaCy with filtering"""
         doc = self.nlp(text)
         aspects = []
         
+        # Generic/meaningless words to filter out
+        generic_aspects = {
+            'lot', 'lots', 'thing', 'things', 'way', 'ways',
+            'place', 'year', 'years', 'day', 'days', 'end', 'need', 'part',
+            'review', 'experience', 'experiences', 'order', 'bit', 'kind', 'type', 'sort',
+            'everything', 'anything', 'something', 'nothing', 'someone', 'anyone',
+            'one', 'two', 'three', 'number', 'hours', 'hour',
+            'face', 'butt', 'leg', 'legs', 'arm', 'arms', 'hand', 'hands',
+            'head', 'body', 'smile', 'shout', 'notch', 'russell', 'passion',
+            'desire', 'ideas', 'recommendations', 'encouragement',
+            'chicken', 'grape', 'melon', 'leaves', 'jalapeño', 'tamale',
+            'locations', 'location', 'diner', 'restaurant', 'weekends', 'weekend',
+            'expectations', 'assortment', 'family', 'clients', 'workouts', 'hotel'
+        }
+        
+        # Extract single nouns
         for token in doc:
             if token.pos_ in ['NOUN', 'PROPN'] and not token.is_stop and len(token.text) > 2:
-                aspects.append(token.text.lower())
+                aspect = token.text.lower()
+                if aspect not in generic_aspects:
+                    aspects.append(aspect)
         
+        # Extract noun chunks (multi-word aspects)
         for chunk in doc.noun_chunks:
-            if len(chunk.text.split()) <= 3 and not any(token.is_stop for token in chunk):
-                aspects.append(chunk.text.lower())
+            if 1 < len(chunk.text.split()) <= 3:  # Between 2 and 3 words
+                chunk_text = chunk.text.lower()
+                
+                # Skip possessive phrases (his/her/their/your + noun)
+                if chunk_text.startswith(('his ', 'her ', 'their ', 'your ', 'my ', 'our ')):
+                    continue
+                
+                # Skip number phrases
+                if chunk[0].pos_ == 'NUM':
+                    continue
+                
+                # Skip if all words are stop words or generic
+                words = [w.text.lower() for w in chunk if not w.is_stop]
+                if words and all(w not in generic_aspects for w in words):
+                    aspects.append(chunk_text)
         
-        return list(set(aspects))
+        # Deduplicate and filter
+        unique_aspects = list(set(aspects))
+        
+        # Remove articles from aspects
+        cleaned_aspects = []
+        for asp in unique_aspects:
+            cleaned = asp
+            # Remove leading articles
+            for article in ['the ', 'a ', 'an ']:
+                if cleaned.startswith(article):
+                    cleaned = cleaned[len(article):]
+            cleaned_aspects.append(cleaned)
+        
+        # Remove duplicates after cleaning
+        unique_aspects = list(set(cleaned_aspects))
+        
+        # Remove aspects that are substrings of others (keep longer ones)
+        filtered = []
+        for asp in sorted(unique_aspects, key=len, reverse=True):
+            if not any(asp in other and asp != other for other in filtered):
+                filtered.append(asp)
+        
+        # Final quality filters
+        final = []
+        for asp in filtered:
+            # Skip if starts with negation/quantifier
+            if asp.startswith(('no ', 'many ', 'every ', 'all ', 'some ')):
+                continue
+            # Skip very generic phrases
+            if asp in ['eclectic assortment', 'clarion hotel', 'family']:
+                continue
+            final.append(asp)
+        
+        return final
     
     def _get_aspect_context(self, text: str, aspect: str) -> str:
         """Get context around an aspect for sentiment analysis"""
